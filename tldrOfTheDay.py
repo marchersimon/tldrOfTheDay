@@ -12,11 +12,12 @@ Options:
   -h, --help		Display this help.
   -v, --version		Display version information.
       --please		Print a new random command, independent of time and day.
+  -a, --all			Print any command installed on the system.
 """
 
 def parseArguments():
 	try:
-		opts, args = getopt.getopt(sys.argv[1:], "hv", ["help", "version", "please"])
+		opts, args = getopt.getopt(sys.argv[1:], "hva", ["help", "version", "please", "all"])
 	except getopt.GetoptError as err:
 		print(err)
 		sys.exit(1)
@@ -24,6 +25,7 @@ def parseArguments():
 	global arguments
 	arguments = {
 		'random': False,
+		'all': False,
 	}
 
 	for arg, val in opts:
@@ -35,6 +37,8 @@ def parseArguments():
 			sys.exit()
 		elif arg == "--please":
 			arguments['random'] = True
+		elif arg in ("-a", '--all'):
+			arguments['all'] = True
 
 def readTldr():
 	tldrList = list()
@@ -50,9 +54,37 @@ def readBin():
 			for file in f:
 				binList.append(file)
 	return binList
-				
-def getCommandOfTheDay(tldrList, binList):
-	undocumentedList = list(set(binList) - set(tldrList))
+
+def readHistory(binList):
+	file = open(os.path.join(os.getenv("HOME"), '.zsh_history'), "r", encoding='utf8', errors='ignore')
+	
+	historyList = list()
+	
+	while True:
+		line = file.readline()
+		if not line:
+			break
+		
+		if not line.startswith(":"):
+			continue
+		
+		if line.startswith("./", 15):
+			continue
+
+		if line.startswith("sudo", 15) or line.startswith("doas", 15):
+			historyList.append((line[15:].split()[1]))
+		else:
+			historyList.append((line[15:].split()[0]))
+		
+	file.close()
+	historyList = list(set(historyList) & set(binList))
+	
+	historyList.sort()
+	
+	return historyList
+
+def getCommandOfTheDay(tldrList, commandList):
+	undocumentedList = list(set(commandList) - set(tldrList))
 	undocumentedList.sort()
 
 	if not arguments['random']:
@@ -64,7 +96,11 @@ def main():
 	parseArguments()
 	tldrList = readTldr()
 	binList = readBin()
-	getCommandOfTheDay(tldrList, binList)
+	historyList = readHistory(binList)
+	if arguments['all']:
+		getCommandOfTheDay(tldrList, binList)
+	else:
+		getCommandOfTheDay(tldrList, historyList)
 
 if __name__ == "__main__":
 	main()
