@@ -42,7 +42,7 @@ def parseArguments():
 
 def readTldr():
 	tldrList = list()
-	for r, d, f in os.walk(os.path.join(os.getenv("HOME"), '.tldr/cache/pages/')):
+	for r, d, f in os.walk(os.path.join(os.getenv("HOME"), '.cache/tldr/pages/')):
 		for file in f:
 			tldrList.append(file.rstrip(file[-3:]))
 	return tldrList
@@ -53,6 +53,7 @@ def readBin():
 		for r, d, f in os.walk(path):
 			for file in f:
 				binList.append(file)
+
 	return binList
 
 def readHistory(binList):
@@ -65,22 +66,21 @@ def readHistory(binList):
 		if not line:
 			break
 		
-		if not line.startswith(":"):
+		if line.startswith("./"):
 			continue
 		
-		if line.startswith("./", 15):
+		if line == "\n":
 			continue
 
-		if line.startswith("sudo", 15) or line.startswith("doas", 15):
-			historyList.append((line[15:].split()[1]))
+		if line.startswith("sudo") or line.startswith("doas"):
+			historyList.append(line.split()[1])
 		else:
-			historyList.append((line[15:].split()[0]))
+			historyList.append(line.split()[0])
 		
 	file.close()
-	historyList = list(set(historyList) & set(binList))
-	
 	historyList.sort()
-	
+	historyList = list(set(historyList) & set(binList))
+
 	return historyList
 
 def getCommandOfTheDay(tldrList, commandList):
