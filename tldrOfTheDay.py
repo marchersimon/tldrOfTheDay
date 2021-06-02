@@ -56,7 +56,7 @@ def readBin():
 	return binList
 
 def readHistory(binList):
-	file = open(os.path.join(os.getenv("HOME"), '.zsh_history'), "r", encoding='utf8', errors='ignore')
+	file = open(os.path.join(os.getenv("HOME"), '.zhistory'), "r", encoding='utf8', errors='ignore')
 	
 	historyList = list()
 	
@@ -89,7 +89,8 @@ def getCommandOfTheDay(tldrList, commandList):
 
 	if not arguments['random']:
 		random.seed(int(time.time() / (60*60*24)))
-	
+
+	print(len(undocumentedList))
 	print(undocumentedList[random.randint(0, len(undocumentedList))])
 
 def main():

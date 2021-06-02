@@ -1,4 +1,4 @@
-A simple Python script, which prints a random command, either in `.zsh_history` or installed on the system, but not yet documented by the tldr project. To prevent the "Rerun the command until a fitting command appears"-effect, the seed for the random numbers only changes every 24 hours.
+A simple Python script, which prints a random command, either in `.zhistory` or installed on the system, but not yet documented by the tldr project. To prevent the "Rerun the command until a fitting command appears"-effect, the seed for the random numbers only changes every 24 hours.
 
 ```
 Usage: tldrOfTheDay [options]
